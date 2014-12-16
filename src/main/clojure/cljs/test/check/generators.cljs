@@ -7,12 +7,13 @@
 ;   the terms of this license.
 ;   You must not remove this notice, or any other, from this software.
 
-(ns clojure.test.check.generators
+(ns cljs.test.check.generators
   (:refer-clojure :exclude [int vector list hash-map map keyword
                             char boolean byte bytes sequence
                             shuffle not-empty symbol namespace])
   (:require [cljs.core :as core]
-            [cljs.test.check.rose-tree :as rose])
+            [cljs.test.check.rose-tree :as rose]
+            [goog.string :as gstring])
   (:import [goog.testing PseudoRandom]))
 
 
@@ -430,13 +431,15 @@
           ;; nice, relatively quick shrinks.
           (vector (tuple index-gen index-gen) 0 (* 2 (count coll))))))
 
-(def byte
-  "Generates `java.lang.Byte`s, using the full byte-range."
-  (fmap core/byte (choose Byte/MIN_VALUE Byte/MAX_VALUE)))
+;; NOTE: Comment out for now - David
+;;
+;; (def byte
+;;   "Generates `java.lang.Byte`s, using the full byte-range."
+;;   (fmap core/byte (choose Byte/MIN_VALUE Byte/MAX_VALUE)))
 
-(def bytes
-  "Generates byte-arrays."
-  (fmap core/byte-array (vector byte)))
+;; (def bytes
+;;   "Generates byte-arrays."
+;;   (fmap core/byte-array (vector byte)))
 
 (defn map
   "Create a generator that generates maps, with keys chosen from
@@ -533,7 +536,7 @@
   (core/boolean (and d
                      (or (= \+ c)
                          (= \- c))
-                     (Character/isDigit d))))
+                     (gstring/isNumeric d))))
 
 (def ^{:private true} namespace-segment
   "Generate the segment of a namespace."

@@ -9,7 +9,7 @@
 
 (ns cljs.test.check
   (:require [cljs.test.check.generators :as gen]
-            [cljs.test.check.clojure-test :as ct]
+            [cljs.test.check.cljs-test :as ct]
             [cljs.test.check.rose-tree :as rose]))
 
 (declare shrink-loop failure)
@@ -18,7 +18,7 @@
   [seed]
   (if seed
     [seed (gen/random seed)]
-    (let [non-nil-seed (System/currentTimeMillis)]
+    (let [non-nil-seed (.valueOf (js/Date.))]
       [non-nil-seed (gen/random non-nil-seed)])))
 
 (defn- complete
@@ -29,7 +29,7 @@
 (defn not-falsey-or-exception?
   "True if the value is not falsy or an exception"
   [value]
-  (and value (not (instance? Throwable value))))
+  (and value (not (instance? js/Error value))))
 
 (defn quick-check
   "Tests `property` `num-tests` times.
