@@ -15,14 +15,18 @@
   :cljsbuild
   {:builds
    [{:id "dev"
-     :source-paths ["src/main/clojure/cljs" "src/test/clojure/cljs"]
+     :source-paths ["src/main/clojure" "src/test/clojure"]
+     :notify-command ["node" "resources/run.js"]
      :compiler {:optimizations :none
-                :output-to "target/cljs/test-dev/tests.js"
-                :output-dir "target/cljs/test-dev/out"
+                :target :nodejs
+                :output-to "target/cljs/test_dev/tests.js"
+                :output-dir "target/cljs/test_dev/out"
                 :source-map true}}
     {:id "adv"
-     :source-paths ["src/main/clojure/cljs" "src/test/clojure/cljs"]
+     :source-paths ["src/main/clojure" "src/test/clojure"]
+     :notify-command ["node" "target/cljs/test_adv/tests.js"]
      :compiler {:optimizations :advanced
+                :target :nodejs
                 :pretty-print false
-                :output-to "target/cljs/test-adv/tests.js"
-                :output-dir "target/cljs/test-adv/out"}}]})
+                :output-to "target/cljs/test_adv/tests.js"
+                :output-dir "target/cljs/test_adv/out"}}]})

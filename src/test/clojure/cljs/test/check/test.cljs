@@ -12,6 +12,7 @@
     (is (gen/generator? (gen/vector gen/int)))
     (is (gen/generator? (gen/return 5)))))
 
+
 (deftest values-are-not-generators
   (testing "generator? returns false when called with a value"
     (is (not (gen/generator? 5)))
