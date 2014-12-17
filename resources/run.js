@@ -2,7 +2,7 @@ try {
     require("source-map-support").install();
 } catch(err) {
 }
-require("../target/cljs/test_dev/out/goog/bootstrap/nodejs.js");
-require("../target/cljs/test_dev/tests.js");
-goog.require("cljs.test.check.run_tests");
+require("../target/cljs/node_dev/out/goog/bootstrap/nodejs.js");
+require("../target/cljs/node_dev/tests.js");
+goog.require("cljs.test.check.node_runner");
 goog.require("cljs.nodejscli");
