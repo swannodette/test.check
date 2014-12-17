@@ -13,7 +13,8 @@
                             shuffle not-empty symbol namespace])
   (:require [cljs.core :as core]
             [cljs.test.check.rose-tree :as rose]
-            [goog.string :as gstring])
+            [goog.string :as gstring]
+            [clojure.string])
   (:import [goog.testing PseudoRandom]))
 
 
@@ -74,7 +75,7 @@
 (defn fmap
   [f gen]
   (assert (generator? gen) "Second arg to fmap must be a generator")
-  (gen-fmap (partial rose/fmap f) gen))
+  (gen-fmap #(rose/fmap f %) gen))
 
 
 (defn return
@@ -130,7 +131,7 @@
   ([generator max-size]
    (let [r (random)
          size-seq (make-size-range-seq max-size)]
-     (core/map (comp rose/root (partial call-gen generator r)) size-seq))))
+     (core/map #(rose/root (call-gen generator r %)) size-seq))))
 
 (defn sample
   "Return a sequence of `num-samples` (default 10)
@@ -147,11 +148,11 @@
 
 (defn- halfs
   [n]
-  (take-while (partial not= 0) (iterate #(quot % 2) n)))
+  (take-while #(not= 0 %) (iterate #(quot % 2) n)))
 
 (defn- shrink-int
   [integer]
-  (core/map (partial - integer) (halfs integer)))
+  (core/map #(- integer %) (halfs integer)))
 
 (defn- int-rose-tree
   [value]
@@ -211,7 +212,7 @@
   (assert (every? generator? generators)
           "Arg to one-of must be a collection of generators")
   (bind (choose 0 (dec (count generators)))
-        (partial nth generators)))
+        #(nth generators %)))
 
 (defn- pick
   [[h & tail] n]
@@ -352,7 +353,7 @@
 
 (def neg-int
   "Generate negative integers bounded by the generator's `size` parameter."
-  (fmap (partial * -1) nat))
+  (fmap #(* -1 %) nat))
 
 (def s-pos-int
   "Generate strictly positive integers bounded by the generator's `size`
@@ -423,7 +424,7 @@
   if it's not already."
   [coll]
   (let [index-gen (choose 0 (dec (count coll)))]
-    (fmap (partial reduce swap (vec coll))
+    (fmap #(reduce swap (vec coll) %)
           ;; a vector of swap instructions, with count between
           ;; zero and 2 * count. This means that the average number
           ;; of instructions is count, which should provide sufficient
@@ -446,7 +447,7 @@
   `key-gen` and values chosen from `val-gen`."
   [key-gen val-gen]
   (let [input (vector (tuple key-gen val-gen))]
-    (fmap (partial into {}) input)))
+    (fmap #(into {} %) input)))
 
 (defn hash-map
   "Like clojure.core/hash-map, except the values are generators.
@@ -463,7 +464,7 @@
         vs (take-nth 2 (rest kvs))]
     (assert (every? generator? vs)
             "Value args to hash-map must be generators")
-    (fmap (partial zipmap ks)
+    (fmap #(zipmap ks %)
           (apply tuple vs))))
 
 (def char
@@ -532,10 +533,10 @@
 
   Symbols that start with +3 or -2 are not readable because they look
   like numbers."
-  [c ^Character d]
+  [c d]
   (core/boolean (and d
-                     (or (= \+ c)
-                         (= \- c))
+                     (or (identical? \+ c)
+                         (identical? \- c))
                      (gstring/isNumeric d))))
 
 (def ^{:private true} namespace-segment

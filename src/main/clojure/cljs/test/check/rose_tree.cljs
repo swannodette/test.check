@@ -52,7 +52,7 @@
   "Applies functions `f` to all values in the tree."
   {:no-doc true}
   [f [root children]]
-  [(f root) (map (partial fmap f) children)])
+  [(f root) (map #(fmap f %) children)])
 
 (defn bind
   "Takes a Rose tree (m) and a function (k) from
@@ -68,8 +68,8 @@
   Takes a list of roses, not a rose"
   {:no-doc true}
   [pred [the-root children]]
-  [the-root (map (partial filter pred)
-                 (core/filter (comp pred root) children))])
+  [the-root (map #(filter pred %)
+              (core/filter #(pred (root %)) children))])
 
 (defn permutations
   "Create a seq of vectors, where each rose in turn, has been replaced
@@ -86,7 +86,7 @@
   {:no-doc true}
   [f roses]
   [(apply f (map root roses))
-   (map (partial zip f)
+   (map #(zip f %)
         (permutations roses))])
 
 (defn remove
@@ -101,7 +101,7 @@
   [f roses]
   (if (core/seq roses)
     [(apply f (map root roses))
-     (map (partial shrink f) (remove roses))]
+     (map #(shrink f %) (remove roses))]
     [(f) []]))
 
 (defn collapse
